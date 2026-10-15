@@ -26,6 +26,9 @@ const gameStatus = document.querySelector("#game-status");
 const spinButton = document.querySelector("#spin-button");
 const result = document.querySelector("#result");
 const resultName = document.querySelector("#result-name");
+const settingsButton = document.querySelector("#settings-button");
+const settingsMenu = document.querySelector("#settings-menu");
+const clearAllButton = document.querySelector("#clear-all-button");
 const presetButtons = [...document.querySelectorAll(".preset-button")];
 
 let customPresets = loadCustomPresets();
@@ -61,7 +64,7 @@ function loadCandidates() {
     const saved = JSON.parse(localStorage.getItem(storageKey));
     if (Array.isArray(saved)) {
       const valid = saved.filter((item) => typeof item === "string").map((item) => item.trim()).filter(Boolean);
-      if (valid.length >= minCandidates && valid.length <= maxCandidates) return valid;
+      if (saved.length === 0 || (valid.length > 0 && valid.length <= maxCandidates)) return valid;
     }
   } catch (error) {
     console.warn("저장된 룰렛 후보를 불러오지 못했습니다.", error);
@@ -100,6 +103,13 @@ function findActivePresetId(items) {
 
 function renderCandidates() {
   candidateList.replaceChildren();
+  if (candidates.length === 0) {
+    const emptyItem = document.createElement("li");
+    emptyItem.className = "candidate-empty";
+    emptyItem.textContent = "후보가 비어 있어요. 첫 번째 항목을 추가해 보세요.";
+    candidateList.append(emptyItem);
+  }
+
   candidates.forEach((candidate, index) => {
     const item = document.createElement("li");
     item.className = "candidate-item";
@@ -128,10 +138,18 @@ function renderCandidates() {
   countBadge.textContent = `${candidates.length}개`;
   candidateInput.disabled = candidates.length >= maxCandidates || spinning;
   addForm.querySelector("button").disabled = candidates.length >= maxCandidates || spinning;
-  helperText.textContent = candidates.length >= maxCandidates
-    ? "후보를 더 추가하려면 먼저 하나를 삭제해주세요."
-    : "후보는 2개 이상, 최대 12개까지 추가할 수 있어요.";
+  clearAllButton.disabled = candidates.length === 0 || spinning;
+  helperText.textContent = candidates.length === 0
+    ? "항목을 2개 이상 추가하면 룰렛을 돌릴 수 있어요."
+    : candidates.length < minCandidates
+      ? "룰렛을 돌리려면 항목을 하나 더 추가해주세요."
+      : candidates.length >= maxCandidates
+        ? "후보를 더 추가하려면 먼저 하나를 삭제해주세요."
+        : "항목을 2개 이상, 최대 12개까지 추가할 수 있어요.";
   spinButton.disabled = candidates.length < minCandidates || spinning;
+  if (!spinning && candidates.length < minCandidates) {
+    gameStatus.textContent = candidates.length === 0 ? "ADD OPTIONS" : "ADD ONE MORE";
+  }
   presetNameInput.disabled = spinning;
   presetSaveForm.querySelector("button").disabled = spinning;
   presetButtons.forEach((button) => {
@@ -185,6 +203,31 @@ function drawWheel() {
   const size = canvas.width;
   const center = size / 2;
   const radius = center - 5;
+  if (candidates.length === 0) {
+    context.clearRect(0, 0, size, size);
+    context.save();
+    context.translate(center, center);
+    context.beginPath();
+    context.arc(0, 0, radius, 0, Math.PI * 2);
+    context.fillStyle = "#17202d";
+    context.fill();
+    context.setLineDash([8, 12]);
+    context.strokeStyle = "rgba(211, 250, 85, 0.48)";
+    context.lineWidth = 5;
+    context.stroke();
+    context.setLineDash([]);
+    context.textAlign = "center";
+    context.textBaseline = "middle";
+    context.fillStyle = "#d3fa55";
+    context.font = '800 25px "DM Sans", "Noto Sans KR", sans-serif';
+    context.fillText("ADD OPTIONS", 0, -15);
+    context.fillStyle = "#a5afc2";
+    context.font = '600 17px "Noto Sans KR", sans-serif';
+    context.fillText("후보를 추가해 주세요", 0, 22);
+    context.restore();
+    return;
+  }
+
   const segment = (Math.PI * 2) / candidates.length;
 
   context.clearRect(0, 0, size, size);
@@ -256,7 +299,7 @@ function addCandidate(value) {
 
   candidates.push(candidate);
   activePresetId = null;
-  gameStatus.textContent = "READY TO PLAY";
+  gameStatus.textContent = candidates.length < minCandidates ? "ADD ONE MORE" : "READY TO PLAY";
   clearResult();
   saveCandidates();
   renderCandidates();
@@ -268,7 +311,7 @@ function removeCandidate(index) {
   if (candidates.length <= minCandidates || spinning) return;
   candidates.splice(index, 1);
   activePresetId = null;
-  gameStatus.textContent = "READY TO PLAY";
+  gameStatus.textContent = candidates.length < minCandidates ? "ADD ONE MORE" : "READY TO PLAY";
   clearResult();
   saveCandidates();
   renderCandidates();
@@ -291,6 +334,10 @@ function saveCurrentPreset(name) {
   if (!presetName) {
     presetStatus.textContent = "프리셋 이름을 입력해주세요.";
     presetNameInput.focus();
+    return;
+  }
+  if (candidates.length < minCandidates) {
+    presetStatus.textContent = "프리셋으로 저장하려면 후보를 2개 이상 추가해주세요.";
     return;
   }
   if (customPresets.some((preset) => preset.name.toLocaleLowerCase() === presetName.toLocaleLowerCase())) {
@@ -387,6 +434,28 @@ function spin() {
   requestAnimationFrame(animate);
 }
 
+function setSettingsMenuOpen(open) {
+  settingsMenu.hidden = !open;
+  settingsButton.setAttribute("aria-expanded", String(open));
+  settingsButton.setAttribute("aria-label", open ? "설정 메뉴 닫기" : "설정 메뉴 열기");
+}
+
+function clearAllCandidates() {
+  if (spinning || candidates.length === 0) return;
+  if (!window.confirm("룰렛 항목을 모두 삭제할까요?")) return;
+
+  candidates = [];
+  activePresetId = null;
+  gameStatus.textContent = "ADD OPTIONS";
+  spinButton.querySelector("span:nth-child(2)").textContent = "룰렛 돌리기";
+  clearResult();
+  saveCandidates();
+  renderCandidates();
+  candidateInput.value = "";
+  presetStatus.textContent = "";
+  setSettingsMenuOpen(false);
+}
+
 function normalize(angle) {
   const fullTurn = Math.PI * 2;
   return ((angle % fullTurn) + fullTurn) % fullTurn;
@@ -407,6 +476,23 @@ presetButtons.forEach((button) => {
 });
 
 spinButton.addEventListener("click", spin);
+settingsButton.addEventListener("click", () => {
+  setSettingsMenuOpen(settingsMenu.hidden);
+});
+clearAllButton.addEventListener("click", clearAllCandidates);
+
+document.addEventListener("click", (event) => {
+  if (!settingsMenu.hidden && !event.target.closest(".header-menu")) {
+    setSettingsMenuOpen(false);
+  }
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && !settingsMenu.hidden) {
+    setSettingsMenuOpen(false);
+    settingsButton.focus();
+  }
+});
 
 renderCustomPresets();
 renderCandidates();
