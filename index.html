@@ -6,9 +6,8 @@
     <meta name="theme-color" content="#101522">
     <meta name="description" content="후보를 정하고 룰렛을 돌려 오늘의 선택을 재미있게 정해보세요.">
     <title>돌려돌려 — 오늘의 선택 룰렛</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
     <script src="app.js" defer></script>
   </head>
@@ -16,8 +15,9 @@
     <main class="app-shell">
       <header class="topbar">
         <a class="brand" href="#" aria-label="돌려돌려 홈">
-          <span class="brand-mark" aria-hidden="true">↻</span>
-          <span class="brand-name">돌려돌려<span class="brand-period">.</span></span>
+          <span class="brand-mark" aria-hidden="true">
+            <img src="assets/dart-logo.svg" alt="">
+          </span>
         </a>
         <div class="topbar-meta">
           <span class="topbar-note">PICK YOUR FATE</span>
@@ -59,6 +59,14 @@
             <img class="wheel-art" src="assets/roulette-wheel.png" alt="" aria-hidden="true" width="626" height="626">
             <div class="pointer" aria-hidden="true"><span></span></div>
             <canvas id="wheel" width="720" height="720" aria-label="후보가 표시된 룰렛"></canvas>
+            <div class="fireworks" id="fireworks" aria-hidden="true" hidden>
+              <span class="firework-burst">
+                <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+              </span>
+              <span class="firework-burst firework-burst-secondary">
+                <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+              </span>
+            </div>
           </div>
           <button class="spin-button" id="spin-button" type="button">
             <span class="spin-icon" aria-hidden="true">↻</span>

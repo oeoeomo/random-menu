@@ -27,6 +27,7 @@ const gameStatus = document.querySelector("#game-status");
 const spinButton = document.querySelector("#spin-button");
 const result = document.querySelector("#result");
 const resultName = document.querySelector("#result-name");
+const fireworks = document.querySelector("#fireworks");
 const settingsButton = document.querySelector("#settings-button");
 const settingsMenu = document.querySelector("#settings-menu");
 const clearAllButton = document.querySelector("#clear-all-button");
@@ -41,6 +42,7 @@ let rotation = 0;
 let spinning = false;
 let soundEnabled = loadSoundPreference();
 let audioContext = null;
+let fireworksTimer = null;
 
 soundToggle.checked = soundEnabled;
 soundStatus.textContent = soundEnabled ? "결과 순간에만 재생 · 켜짐" : "결과 순간에만 재생 · 기본 꺼짐";
@@ -301,10 +303,10 @@ function drawWheel() {
     context.textAlign = "center";
     context.textBaseline = "middle";
     context.fillStyle = "#d3fa55";
-    context.font = '800 25px "DM Sans", "Noto Sans KR", sans-serif';
+    context.font = '700 25px Pretendard, sans-serif';
     context.fillText("ADD OPTIONS", 0, -15);
     context.fillStyle = "#a5afc2";
-    context.font = '600 17px "Noto Sans KR", sans-serif';
+    context.font = '400 17px Pretendard, sans-serif';
     context.fillText("후보를 추가해 주세요", 0, 22);
     context.restore();
     return;
@@ -339,7 +341,7 @@ function drawWheel() {
     context.fillStyle = isRed ? "#fffdf8" : "#373638";
     context.shadowColor = "rgba(82, 54, 36, 0.2)";
     context.shadowBlur = isRed ? 3 : 1;
-    context.font = `700 ${labelFontSize(candidates.length)}px "Noto Sans KR", sans-serif`;
+    context.font = `400 ${labelFontSize(candidates.length)}px Pretendard, sans-serif`;
     context.fillText(candidate, radius * 0.81, 0, radius * 0.48);
     context.restore();
   });
@@ -463,6 +465,22 @@ function clearResult() {
   result.hidden = true;
   result.classList.remove("is-winning");
   resultName.textContent = "";
+  hideFireworks();
+}
+
+function hideFireworks() {
+  window.clearTimeout(fireworksTimer);
+  fireworksTimer = null;
+  fireworks.classList.remove("is-active");
+  fireworks.hidden = true;
+}
+
+function showFireworks() {
+  hideFireworks();
+  fireworks.hidden = false;
+  void fireworks.offsetWidth;
+  fireworks.classList.add("is-active");
+  fireworksTimer = window.setTimeout(hideFireworks, 1100);
 }
 
 function randomUnit() {
@@ -516,6 +534,7 @@ function spin() {
     result.classList.remove("is-winning");
     void result.offsetWidth;
     result.classList.add("is-winning");
+    showFireworks();
     playResultSound();
     spinButton.querySelector("span:nth-child(2)").textContent = "다시 돌리기";
     renderCandidates();

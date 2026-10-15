@@ -1,8 +1,11 @@
 :root {
   color-scheme: dark;
-  font-family: "DM Sans", "Noto Sans KR", sans-serif;
+  font-family: Pretendard, sans-serif;
   color: #f5f6fb;
   background: #101522;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -40,6 +43,7 @@ input {
 
 button {
   color: inherit;
+  font-weight: 600;
 }
 
 button:focus-visible,
@@ -85,15 +89,18 @@ a:focus-visible {
   color: var(--bg);
   background: var(--lime);
   box-shadow: 0 3px 14px rgb(211 250 85 / 15%);
-  font-size: 23px;
-  font-weight: 700;
-  line-height: 1;
+}
+
+.brand-mark img {
+  display: block;
+  width: 27px;
+  height: 27px;
 }
 
 .brand-name {
   font-size: 17px;
-  font-weight: 800;
-  letter-spacing: -0.7px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
 .brand-period {
@@ -236,7 +243,7 @@ a:focus-visible {
 .spin-hint {
   font-size: 9px;
   font-weight: 700;
-  letter-spacing: 1.5px;
+  letter-spacing: 1px;
 }
 
 .topbar-note {
@@ -292,10 +299,10 @@ a:focus-visible {
 
 h1 {
   margin: 0;
-  font-size: clamp(24px, 3.2vw, 32px);
-  font-weight: 800;
-  letter-spacing: -1.7px;
-  line-height: 1.25;
+  font-size: clamp(26px, 3.2vw, 34px);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1.3;
 }
 
 h1 span {
@@ -305,7 +312,7 @@ h1 span {
 .stage-copy {
   margin: 7px 0 0;
   color: var(--muted);
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .wheel-panel {
@@ -381,6 +388,63 @@ h1 span {
   transform: translate(-50%, -50%);
 }
 
+.fireworks {
+  position: absolute;
+  z-index: 4;
+  inset: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.fireworks[hidden] {
+  display: none;
+}
+
+.firework-burst {
+  position: absolute;
+  top: 32%;
+  left: 24%;
+  width: 1px;
+  height: 1px;
+}
+
+.firework-burst-secondary {
+  top: 29%;
+  left: 76%;
+}
+
+.firework-burst i {
+  position: absolute;
+  width: 5px;
+  height: 13px;
+  border-radius: 99px;
+  background: var(--spark-color, var(--lime));
+  box-shadow: 0 0 9px 2px color-mix(in srgb, var(--spark-color, var(--lime)) 70%, transparent);
+  opacity: 0;
+}
+
+.fireworks.is-active .firework-burst i {
+  animation: firework-launch 850ms cubic-bezier(.16, .72, .28, 1) both;
+}
+
+.firework-burst i:nth-child(1) { --spark-x: -38px; --spark-y: 0px; --spark-color: var(--lime); }
+.firework-burst i:nth-child(2) { --spark-x: -27px; --spark-y: -27px; --spark-color: #fff3a6; animation-delay: 30ms; }
+.firework-burst i:nth-child(3) { --spark-x: 0px; --spark-y: -38px; --spark-color: var(--cyan); animation-delay: 55ms; }
+.firework-burst i:nth-child(4) { --spark-x: 27px; --spark-y: -27px; --spark-color: #ff9b78; animation-delay: 20ms; }
+.firework-burst i:nth-child(5) { --spark-x: 38px; --spark-y: 0px; --spark-color: var(--lime); animation-delay: 45ms; }
+.firework-burst i:nth-child(6) { --spark-x: 27px; --spark-y: 27px; --spark-color: var(--cyan); animation-delay: 65ms; }
+.firework-burst i:nth-child(7) { --spark-x: 0px; --spark-y: 38px; --spark-color: #ff9b78; animation-delay: 25ms; }
+.firework-burst i:nth-child(8) { --spark-x: -27px; --spark-y: 27px; --spark-color: #fff3a6; animation-delay: 50ms; }
+
+.firework-burst-secondary i:nth-child(1) { --spark-x: -30px; --spark-y: 0px; --spark-color: var(--cyan); }
+.firework-burst-secondary i:nth-child(2) { --spark-x: -21px; --spark-y: -21px; --spark-color: var(--lime); animation-delay: 35ms; }
+.firework-burst-secondary i:nth-child(3) { --spark-x: 0px; --spark-y: -30px; --spark-color: #ff9b78; animation-delay: 60ms; }
+.firework-burst-secondary i:nth-child(4) { --spark-x: 21px; --spark-y: -21px; --spark-color: #fff3a6; animation-delay: 25ms; }
+.firework-burst-secondary i:nth-child(5) { --spark-x: 30px; --spark-y: 0px; --spark-color: var(--lime); animation-delay: 50ms; }
+.firework-burst-secondary i:nth-child(6) { --spark-x: 21px; --spark-y: 21px; --spark-color: #ff9b78; animation-delay: 70ms; }
+.firework-burst-secondary i:nth-child(7) { --spark-x: 0px; --spark-y: 30px; --spark-color: var(--cyan); animation-delay: 30ms; }
+.firework-burst-secondary i:nth-child(8) { --spark-x: -21px; --spark-y: 21px; --spark-color: #fff3a6; animation-delay: 55ms; }
+
 .pointer {
   position: absolute;
   z-index: 3;
@@ -432,7 +496,7 @@ h1 span {
   box-shadow: 0 5px 0 #92b52b, 0 9px 20px rgb(0 0 0 / 21%);
   cursor: var(--dart-cursor);
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 600;
   transition: transform 140ms ease, box-shadow 140ms ease, filter 140ms ease;
 }
 
@@ -500,12 +564,14 @@ h1 span {
 
 .result-label {
   color: #97a18b;
-  font-size: 10px;
+  font-size: 12px;
+  font-weight: 400;
 }
 
 .result strong {
   color: var(--lime);
-  font-size: 14px;
+  font-size: 16px;
+  font-weight: 700;
 }
 
 .result-burst {
@@ -554,15 +620,15 @@ h1 span {
   margin: 0 0 3px;
   color: #77839a;
   font-size: 8px;
-  letter-spacing: 1.4px;
+  letter-spacing: 1.1px;
 }
 
 .card-heading h2 {
   margin: 0;
   color: #f2f4fa;
-  font-size: 15px;
-  font-weight: 700;
-  letter-spacing: -0.5px;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
 }
 
 .count-badge {
@@ -611,7 +677,7 @@ h1 span {
   color: #b0b9ca;
   background: #222a3a;
   cursor: var(--dart-cursor);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
   white-space: nowrap;
   transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
@@ -679,7 +745,7 @@ h1 span {
   background: #263144;
   cursor: var(--dart-cursor);
   font-size: 18px;
-  font-weight: 700;
+  font-weight: 600;
   transition: background 150ms ease, transform 150ms ease;
 }
 
@@ -826,8 +892,8 @@ h1 span {
   flex: 1;
   overflow: hidden;
   color: #c6ccda;
-  font-size: 10px;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 400;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -860,7 +926,7 @@ h1 span {
 .helper-text {
   margin: 7px 0 0;
   color: #707b90;
-  font-size: 9px;
+  font-size: 11px;
 }
 
 .footer {
@@ -916,6 +982,12 @@ h1 span {
 @keyframes wheel-halo {
   0%, 100% { opacity: 0.72; transform: scale(0.985); }
   50% { opacity: 1; transform: scale(1.035); }
+}
+
+@keyframes firework-launch {
+  0% { opacity: 0; transform: translate(0, 0) scale(0.2) rotate(0deg); }
+  15% { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--spark-x), var(--spark-y)) scale(0.7) rotate(90deg); }
 }
 
 @media (min-width: 1000px) and (min-height: 900px) {
@@ -1007,7 +1079,7 @@ h1 span {
   }
 
   .stage-copy {
-    font-size: 10px;
+    font-size: 12px;
   }
 
   .wheel-stage {
@@ -1057,7 +1129,7 @@ h1 span {
   }
 
   .candidate-name {
-    font-size: 9px;
+    font-size: 11px;
   }
 
   .footer {
