@@ -45,10 +45,10 @@
 ## 저장소 및 배포
 
 - **GitHub 저장소**: https://github.com/oeoeomo/random-menu
-- **GitHub Pages 배포 주소**: 미확인 — Pages 활성화 및 공개 URL 확인 후 아래에 기록합니다.
-- **배포 URL 기록 위치**: `[배포된 사이트 주소](여기에-확인된-GitHub-Pages-URL-입력)`
+- **배포 워크플로**: [`.github/workflows/deploy.yml`](./.github/workflows/deploy.yml) — `main` 브랜치 푸시 또는 Actions 수동 실행 시 정적 파일을 배포합니다.
+- **GitHub Pages 배포 주소**: https://oeoeomo.github.io/random-menu/
 
-저장소 주소는 현재 Git 원격 설정을 기준으로 기록했습니다. GitHub Pages의 설정 및 배포 여부는 확인되지 않았으므로 주소를 임의로 기재하지 않았습니다.
+저장소 주소는 현재 Git 원격 설정을 기준으로 기록했습니다. GitHub Actions의 Pages 배포 실행이 성공한 것을 확인했으며, 위 공개 주소에서 앱 페이지가 응답하는 것을 확인했습니다.
 
 ## 문서
 
