@@ -183,7 +183,7 @@ function renderCustomPresets() {
 function drawWheel() {
   const size = canvas.width;
   const center = size / 2;
-  const radius = center - 20;
+  const radius = center - 5;
   const segment = (Math.PI * 2) / candidates.length;
 
   context.clearRect(0, 0, size, size);
@@ -199,23 +199,41 @@ function drawWheel() {
     context.moveTo(0, 0);
     context.arc(0, 0, radius, start, end);
     context.closePath();
-    context.fillStyle = colors[index % colors.length];
+    const isRed = index % 2 === 0;
+    context.fillStyle = isRed ? "#ed1c2e" : "#fffdf9";
     context.fill();
-    context.strokeStyle = "rgba(255, 255, 255, 0.85)";
-    context.lineWidth = 4;
+    context.strokeStyle = isRed ? "rgba(255, 255, 255, 0.75)" : "rgba(72, 68, 65, 0.14)";
+    context.lineWidth = 2;
     context.stroke();
 
     context.save();
     context.rotate(start + segment / 2);
     context.textAlign = "right";
     context.textBaseline = "middle";
-    context.fillStyle = "#fffdf8";
+    context.fillStyle = isRed ? "#fffdf8" : "#373638";
     context.shadowColor = "rgba(82, 54, 36, 0.2)";
-    context.shadowBlur = 3;
+    context.shadowBlur = isRed ? 3 : 1;
     context.font = `700 ${labelFontSize(candidates.length)}px "Noto Sans KR", sans-serif`;
     context.fillText(candidate, radius * 0.81, 0, radius * 0.48);
     context.restore();
   });
+
+  context.save();
+  context.shadowColor = "rgba(73, 50, 23, 0.24)";
+  context.shadowBlur = 8;
+  context.beginPath();
+  context.arc(0, 0, center * 0.19, 0, Math.PI * 2);
+  context.fillStyle = "#f4c735";
+  context.fill();
+  context.restore();
+
+  context.beginPath();
+  context.arc(0, 0, center * 0.145, 0, Math.PI * 2);
+  context.fillStyle = "#ffe879";
+  context.fill();
+  context.strokeStyle = "#eab42e";
+  context.lineWidth = 3;
+  context.stroke();
 
   context.restore();
 }
