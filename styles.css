@@ -16,6 +16,7 @@
   --lime: #d3fa55;
   --cyan: #67e5e5;
   --orange: #ff785b;
+  --dart-cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cpath d='m9 28 16-17 4 4-16 17z' fill='%2367e5e5' stroke='%23101522' stroke-width='1.6' stroke-linejoin='round'/%3E%3Cpath d='M9 30 2 38l4-11z' fill='%23d3fa55' stroke='%23101522' stroke-width='1.2' stroke-linejoin='round'/%3E%3Cpath d='m5 24 5-5q2-2 4 0l4 4q2 2 0 4l-5 5q-2 2-4 0l-4-4q-2-2 0-4z' fill='%23d3fa55' stroke='%23101522' stroke-width='1.6' stroke-linejoin='round'/%3E%3Cpath d='M25 14c-4-1-6-4-6-8 0-4 3-7 7-5 3 1 5 4 5 6 4-2 8 1 8 5s-4 7-9 6l-5-2z' fill='%23d3fa55' stroke='%23101522' stroke-width='1.6' stroke-linejoin='round'/%3E%3C/svg%3E") 2 38, auto;
 }
 
 * {
@@ -29,6 +30,7 @@ body {
   background:
     radial-gradient(ellipse at 50% 40%, rgb(35 49 73 / 42%) 0, rgb(16 21 34 / 0%) 44%),
     var(--bg);
+  cursor: var(--dart-cursor);
 }
 
 button,
@@ -117,7 +119,7 @@ a:focus-visible {
   border-radius: 10px;
   color: #b5bfd1;
   background: #1a2130;
-  cursor: pointer;
+  cursor: var(--dart-cursor);
   transition: border-color 150ms ease, color 150ms ease, background 150ms ease;
 }
 
@@ -172,7 +174,7 @@ a:focus-visible {
   justify-content: space-between;
   gap: 10px;
   padding: 5px 4px;
-  cursor: pointer;
+  cursor: var(--dart-cursor);
 }
 
 .sound-setting-copy {
@@ -197,7 +199,7 @@ a:focus-visible {
   flex: 0 0 auto;
   margin: 0;
   accent-color: var(--lime);
-  cursor: pointer;
+  cursor: var(--dart-cursor);
 }
 
 .clear-all-button {
@@ -210,7 +212,7 @@ a:focus-visible {
   border-radius: 7px;
   color: #ff9c87;
   background: rgb(255 120 91 / 7%);
-  cursor: pointer;
+  cursor: var(--dart-cursor);
   font-size: 10px;
   text-align: left;
   transition: border-color 150ms ease, background 150ms ease;
@@ -428,7 +430,7 @@ h1 span {
   color: #151a25;
   background: var(--lime);
   box-shadow: 0 5px 0 #92b52b, 0 9px 20px rgb(0 0 0 / 21%);
-  cursor: pointer;
+  cursor: var(--dart-cursor);
   font-size: 13px;
   font-weight: 800;
   transition: transform 140ms ease, box-shadow 140ms ease, filter 140ms ease;
@@ -608,7 +610,7 @@ h1 span {
   border-radius: 8px;
   color: #b0b9ca;
   background: #222a3a;
-  cursor: pointer;
+  cursor: var(--dart-cursor);
   font-size: 10px;
   font-weight: 600;
   white-space: nowrap;
@@ -649,6 +651,7 @@ h1 span {
   outline: none;
   color: #eef1f7;
   background: #141a27;
+  cursor: text;
   font-size: 10px;
   transition: border-color 150ms ease, box-shadow 150ms ease;
 }
@@ -674,7 +677,7 @@ h1 span {
   border-radius: 8px;
   color: var(--cyan);
   background: #263144;
-  cursor: pointer;
+  cursor: var(--dart-cursor);
   font-size: 18px;
   font-weight: 700;
   transition: background 150ms ease, transform 150ms ease;
@@ -766,7 +769,7 @@ h1 span {
   border: 0;
   color: #8b96a9;
   background: transparent;
-  cursor: pointer;
+  cursor: var(--dart-cursor);
   font-size: 13px;
 }
 
@@ -839,7 +842,7 @@ h1 span {
   border-radius: 5px;
   color: #758096;
   background: transparent;
-  cursor: pointer;
+  cursor: var(--dart-cursor);
   font-size: 14px;
   transition: color 150ms ease, background 150ms ease;
 }
