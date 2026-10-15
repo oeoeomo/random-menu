@@ -324,14 +324,35 @@ h1 span {
 
 .wheel-glow {
   position: absolute;
-  top: 13%;
-  left: 15%;
-  width: 70%;
+  z-index: 0;
+  top: 8%;
+  left: 15.5%;
+  width: 69%;
   aspect-ratio: 1;
   border-radius: 50%;
-  background: rgb(211 250 85 / 8%);
-  filter: blur(28px);
+  background: radial-gradient(
+    circle,
+    rgb(211 250 85 / 8%) 48%,
+    rgb(211 250 85 / 32%) 62%,
+    rgb(103 229 229 / 25%) 72%,
+    rgb(211 250 85 / 12%) 79%,
+    transparent 91%
+  );
+  filter: blur(13px);
+  animation: wheel-halo 3.8s ease-in-out infinite;
   pointer-events: none;
+}
+
+.wheel-glow::after {
+  position: absolute;
+  inset: 6%;
+  border: 2px solid rgb(211 250 85 / 32%);
+  border-radius: 50%;
+  box-shadow:
+    0 0 18px 3px rgb(211 250 85 / 32%),
+    0 0 42px 8px rgb(103 229 229 / 17%),
+    inset 0 0 18px rgb(103 229 229 / 12%);
+  content: "";
 }
 
 .wheel-art {
@@ -887,6 +908,11 @@ h1 span {
   0% { opacity: 0; transform: translate(0, 0) scale(0.35) rotate(-25deg); }
   28% { opacity: 0.9; }
   100% { opacity: 0; transform: translate(var(--spark-x), var(--spark-y)) scale(1) rotate(25deg); }
+}
+
+@keyframes wheel-halo {
+  0%, 100% { opacity: 0.72; transform: scale(0.985); }
+  50% { opacity: 1; transform: scale(1.035); }
 }
 
 @media (min-width: 1000px) and (min-height: 900px) {
