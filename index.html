@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#f8f7f3">
-    <meta name="description" content="고민은 룰렛에게 맡기고, 오늘의 선택을 가볍게 정해보세요.">
+    <meta name="theme-color" content="#101522">
+    <meta name="description" content="후보를 정하고 룰렛을 돌려 오늘의 선택을 재미있게 정해보세요.">
     <title>돌려돌려 — 오늘의 선택 룰렛</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,58 +16,25 @@
     <main class="app-shell">
       <header class="topbar">
         <a class="brand" href="#" aria-label="돌려돌려 홈">
-          <span class="brand-mark" aria-hidden="true">✳</span>
-          <span>돌려돌려</span>
+          <span class="brand-mark" aria-hidden="true">↻</span>
+          <span class="brand-name">돌려돌려<span class="brand-period">.</span></span>
         </a>
-        <span class="topbar-note"><span class="status-dot"></span> 고민은 잠시 맡겨두세요</span>
+        <div class="topbar-meta">
+          <span class="topbar-note">PICK YOUR FATE</span>
+          <span class="status-pill"><span class="status-dot"></span> <span id="game-status">READY TO PLAY</span></span>
+        </div>
       </header>
 
-      <section class="intro" aria-labelledby="page-title">
-        <p class="eyebrow"><span>✦</span> A LITTLE SPIN, A CLEAR MIND</p>
-        <h1 id="page-title">오늘의 선택,<br><span>운명에 맡겨볼까요?</span></h1>
-        <p class="intro-copy">결정하기 어려운 순간, 후보를 적고 룰렛을 돌려보세요.<br class="desktop-break"> 생각보다 마음이 편해질지도 몰라요.</p>
-      </section>
-
-      <section class="workspace" aria-label="룰렛">
-        <aside class="choice-card" aria-labelledby="choices-title">
-          <div class="card-heading">
-            <div>
-              <p class="section-kicker">YOUR OPTIONS</p>
-              <h2 id="choices-title">후보를 정해주세요</h2>
-            </div>
-            <span class="count-badge" id="candidate-count">6개</span>
-          </div>
-
-          <div class="preset-row" aria-label="기본 프리셋">
-            <button class="preset-button" type="button" data-preset="lunch">🍽️ 점심 메뉴</button>
-            <button class="preset-button" type="button" data-preset="penalty">🎭 벌칙</button>
-            <button class="preset-button" type="button" data-preset="weekend">🌿 주말 계획</button>
-          </div>
-
-          <form class="preset-save-form" id="preset-save-form">
-            <label class="sr-only" for="preset-name-input">저장할 프리셋 이름</label>
-            <input id="preset-name-input" name="preset-name" type="text" maxlength="20" placeholder="현재 후보를 프리셋으로 저장" autocomplete="off">
-            <button type="submit">저장</button>
-          </form>
-          <p class="preset-status" id="preset-status" role="status" aria-live="polite"></p>
-
-          <section class="saved-presets" id="saved-presets" aria-label="내 프리셋" hidden>
-            <p class="saved-presets-label">내 프리셋</p>
-            <div class="saved-preset-list" id="saved-preset-list"></div>
-          </section>
-
-          <form class="add-form" id="add-form">
-            <label class="sr-only" for="candidate-input">새 후보 입력</label>
-            <input id="candidate-input" name="candidate" type="text" maxlength="24" placeholder="새로운 후보를 입력하세요" autocomplete="off">
-            <button class="add-button" type="submit" aria-label="후보 추가">+</button>
-          </form>
-
-          <ul class="candidate-list" id="candidate-list" aria-label="룰렛 후보"></ul>
-          <p class="helper-text" id="helper-text">후보는 2개 이상, 최대 12개까지 추가할 수 있어요.</p>
-        </aside>
+      <section class="game-stage" aria-labelledby="page-title">
+        <div class="stage-heading">
+          <p class="stage-kicker"><span class="stage-kicker-mark">✦</span> THE CHOICE IS YOURS</p>
+          <h1 id="page-title">오늘의 선택을 <span>돌려봐!</span></h1>
+          <p class="stage-copy">후보를 정하고, 행운의 주인공을 확인하세요.</p>
+        </div>
 
         <section class="wheel-panel" aria-label="룰렛 돌리기">
           <div class="wheel-stage">
+            <div class="wheel-glow" aria-hidden="true"></div>
             <img class="wheel-art" src="assets/roulette-wheel.png" alt="" aria-hidden="true" width="626" height="626">
             <div class="pointer" aria-hidden="true"><span></span></div>
             <canvas id="wheel" width="720" height="720" aria-label="후보가 표시된 룰렛"></canvas>
@@ -77,19 +44,69 @@
             <span>룰렛 돌리기</span>
             <span class="button-sparkle" aria-hidden="true">✦</span>
           </button>
-          <p class="spin-hint">버튼을 누르면 행운의 선택이 시작돼요</p>
+          <p class="spin-hint">TAP TO SPIN <span aria-hidden="true">·</span> 모두 같은 확률이에요</p>
           <div class="result" id="result" role="status" aria-live="polite" aria-atomic="true" hidden>
-            <span class="result-label">오늘의 선택은</span>
+            <span class="result-label">오늘의 당첨</span>
             <strong id="result-name"></strong>
             <span class="result-confetti" aria-hidden="true">✦</span>
           </div>
         </section>
       </section>
 
+      <section class="choice-card" aria-labelledby="choices-title">
+        <div class="card-heading">
+          <div class="choices-title-group">
+            <p class="section-kicker">GAME SETUP</p>
+            <h2 id="choices-title">플레이할 후보</h2>
+          </div>
+          <span class="count-badge"><span id="candidate-count">6개</span><span class="count-divider">/</span>12</span>
+        </div>
+
+        <div class="control-row">
+          <div class="preset-area">
+            <span class="control-label">빠른 시작</span>
+            <div class="preset-row" aria-label="기본 프리셋">
+              <button class="preset-button" type="button" data-preset="lunch">🍽️ 점심</button>
+              <button class="preset-button" type="button" data-preset="penalty">🎭 벌칙</button>
+              <button class="preset-button" type="button" data-preset="weekend">🌿 주말</button>
+            </div>
+          </div>
+
+          <div class="candidate-entry">
+            <span class="control-label">직접 추가</span>
+            <form class="add-form" id="add-form">
+              <label class="sr-only" for="candidate-input">새 후보 입력</label>
+              <input id="candidate-input" name="candidate" type="text" maxlength="24" placeholder="후보 이름 입력..." autocomplete="off">
+              <button class="add-button" type="submit" aria-label="후보 추가">+</button>
+            </form>
+          </div>
+
+          <div class="preset-save-area">
+            <span class="control-label">내 프리셋</span>
+            <form class="preset-save-form" id="preset-save-form">
+              <label class="sr-only" for="preset-name-input">저장할 프리셋 이름</label>
+              <input id="preset-name-input" name="preset-name" type="text" maxlength="20" placeholder="이름 저장" autocomplete="off">
+              <button type="submit">저장</button>
+            </form>
+          </div>
+        </div>
+
+        <p class="preset-status" id="preset-status" role="status" aria-live="polite"></p>
+        <section class="saved-presets" id="saved-presets" aria-label="내 프리셋 목록" hidden>
+          <span class="saved-presets-label">저장됨</span>
+          <div class="saved-preset-list" id="saved-preset-list"></div>
+        </section>
+
+        <ul class="candidate-list" id="candidate-list" aria-label="룰렛 후보"></ul>
+        <p class="helper-text" id="helper-text">후보는 2개 이상, 최대 12개까지 추가할 수 있어요.</p>
+      </section>
+
       <footer class="footer">
-        <span>모든 후보는 같은 확률로 선택돼요.</span>
-        <span class="footer-heart" aria-hidden="true">♥</span>
-        <span>가끔은 우연이 정답이니까요.</span>
+        <span>유니버설아트디자인학과</span>
+        <span class="footer-divider" aria-hidden="true">/</span>
+        <span>202401243</span>
+        <span class="footer-divider" aria-hidden="true">/</span>
+        <span>모효진</span>
       </footer>
     </main>
   </body>

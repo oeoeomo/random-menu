@@ -22,6 +22,7 @@ const savedPresetsSection = document.querySelector("#saved-presets");
 const savedPresetList = document.querySelector("#saved-preset-list");
 const countBadge = document.querySelector("#candidate-count");
 const helperText = document.querySelector("#helper-text");
+const gameStatus = document.querySelector("#game-status");
 const spinButton = document.querySelector("#spin-button");
 const result = document.querySelector("#result");
 const resultName = document.querySelector("#result-name");
@@ -255,6 +256,7 @@ function addCandidate(value) {
 
   candidates.push(candidate);
   activePresetId = null;
+  gameStatus.textContent = "READY TO PLAY";
   clearResult();
   saveCandidates();
   renderCandidates();
@@ -266,6 +268,7 @@ function removeCandidate(index) {
   if (candidates.length <= minCandidates || spinning) return;
   candidates.splice(index, 1);
   activePresetId = null;
+  gameStatus.textContent = "READY TO PLAY";
   clearResult();
   saveCandidates();
   renderCandidates();
@@ -275,6 +278,7 @@ function setPreset(name) {
   if (spinning || !Object.hasOwn(presets, name)) return;
   candidates = [...presets[name]];
   activePresetId = `builtin:${name}`;
+  gameStatus.textContent = "READY TO PLAY";
   presetStatus.textContent = "";
   clearResult();
   saveCandidates();
@@ -310,6 +314,7 @@ function applyCustomPreset(name) {
   if (!preset) return;
   candidates = [...preset.candidates];
   activePresetId = `custom:${preset.name}`;
+  gameStatus.textContent = "READY TO PLAY";
   presetStatus.textContent = `“${preset.name}” 프리셋을 불러왔어요.`;
   clearResult();
   saveCandidates();
@@ -342,6 +347,7 @@ function randomUnit() {
 function spin() {
   if (spinning || candidates.length < minCandidates) return;
   spinning = true;
+  gameStatus.textContent = "SPIN IN PROGRESS";
   renderCandidates();
   clearResult();
   spinButton.querySelector("span:nth-child(2)").textContent = "돌아가는 중...";
@@ -371,6 +377,7 @@ function spin() {
     rotation = normalize(endRotation);
     drawWheel();
     spinning = false;
+    gameStatus.textContent = "ROUND COMPLETE";
     resultName.textContent = candidates[winner];
     result.hidden = false;
     spinButton.querySelector("span:nth-child(2)").textContent = "다시 돌리기";
