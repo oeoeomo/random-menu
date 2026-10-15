@@ -8,12 +8,18 @@ const colors = ["#f3bf68", "#ed8066", "#8fb9a0", "#829ec6", "#c49bc5", "#e6a85d"
 const minCandidates = 2;
 const maxCandidates = 12;
 const storageKey = "dolly-dolly-candidates";
+const savedPresetsStorageKey = "dolly-dolly-presets";
 
 const canvas = document.querySelector("#wheel");
 const context = canvas.getContext("2d");
 const candidateList = document.querySelector("#candidate-list");
 const candidateInput = document.querySelector("#candidate-input");
 const addForm = document.querySelector("#add-form");
+const presetSaveForm = document.querySelector("#preset-save-form");
+const presetNameInput = document.querySelector("#preset-name-input");
+const presetStatus = document.querySelector("#preset-status");
+const savedPresetsSection = document.querySelector("#saved-presets");
+const savedPresetList = document.querySelector("#saved-preset-list");
 const countBadge = document.querySelector("#candidate-count");
 const helperText = document.querySelector("#helper-text");
 const spinButton = document.querySelector("#spin-button");
@@ -21,9 +27,33 @@ const result = document.querySelector("#result");
 const resultName = document.querySelector("#result-name");
 const presetButtons = [...document.querySelectorAll(".preset-button")];
 
+let customPresets = loadCustomPresets();
 let candidates = loadCandidates();
+let activePresetId = findActivePresetId(candidates);
 let rotation = 0;
 let spinning = false;
+
+function loadCustomPresets() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(savedPresetsStorageKey));
+    if (!Array.isArray(saved)) return [];
+
+    const names = new Set();
+    return saved.filter((preset) => {
+      if (!preset || typeof preset.name !== "string" || !Array.isArray(preset.candidates)) return false;
+      const name = preset.name.trim();
+      const items = preset.candidates.filter((item) => typeof item === "string").map((item) => item.trim()).filter(Boolean);
+      if (!name || names.has(name) || items.length < minCandidates || items.length > maxCandidates) return false;
+      names.add(name);
+      preset.name = name;
+      preset.candidates = items;
+      return true;
+    });
+  } catch (error) {
+    console.warn("저장된 프리셋을 불러오지 못했습니다.", error);
+    return [];
+  }
+}
 
 function loadCandidates() {
   try {
@@ -44,6 +74,27 @@ function saveCandidates() {
   } catch (error) {
     console.warn("룰렛 후보를 저장하지 못했습니다.", error);
   }
+}
+
+function saveCustomPresets(nextPresets) {
+  try {
+    localStorage.setItem(savedPresetsStorageKey, JSON.stringify(nextPresets));
+    customPresets = nextPresets;
+    renderCustomPresets();
+    return true;
+  } catch (error) {
+    console.warn("프리셋을 저장하지 못했습니다.", error);
+    presetStatus.textContent = "브라우저 저장 공간에 프리셋을 저장하지 못했어요.";
+    return false;
+  }
+}
+
+function findActivePresetId(items) {
+  for (const [name, presetCandidates] of Object.entries(presets)) {
+    if (JSON.stringify(items) === JSON.stringify(presetCandidates)) return `builtin:${name}`;
+  }
+  const matchingPreset = customPresets.find((preset) => JSON.stringify(items) === JSON.stringify(preset.candidates));
+  return matchingPreset ? `custom:${matchingPreset.name}` : null;
 }
 
 function renderCandidates() {
@@ -80,7 +131,53 @@ function renderCandidates() {
     ? "후보를 더 추가하려면 먼저 하나를 삭제해주세요."
     : "후보는 2개 이상, 최대 12개까지 추가할 수 있어요.";
   spinButton.disabled = candidates.length < minCandidates || spinning;
+  presetNameInput.disabled = spinning;
+  presetSaveForm.querySelector("button").disabled = spinning;
+  presetButtons.forEach((button) => {
+    button.disabled = spinning;
+  });
+  renderPresetSelection();
   drawWheel();
+}
+
+function renderPresetSelection() {
+  presetButtons.forEach((button) => {
+    button.classList.toggle("is-active", activePresetId === `builtin:${button.dataset.preset}`);
+  });
+  savedPresetList.querySelectorAll("[data-custom-preset]").forEach((button) => {
+    button.classList.toggle("is-active", activePresetId === `custom:${button.dataset.customPreset}`);
+  });
+}
+
+function renderCustomPresets() {
+  savedPresetList.replaceChildren();
+  savedPresetsSection.hidden = customPresets.length === 0;
+
+  customPresets.forEach((preset) => {
+    const item = document.createElement("div");
+    item.className = "saved-preset-item";
+
+    const loadButton = document.createElement("button");
+    loadButton.className = "preset-button";
+    loadButton.type = "button";
+    loadButton.textContent = preset.name;
+    loadButton.dataset.customPreset = preset.name;
+    loadButton.setAttribute("aria-label", `${preset.name} 프리셋 불러오기`);
+    loadButton.disabled = spinning;
+    loadButton.addEventListener("click", () => applyCustomPreset(preset.name));
+
+    const deleteButton = document.createElement("button");
+    deleteButton.className = "saved-preset-delete";
+    deleteButton.type = "button";
+    deleteButton.textContent = "×";
+    deleteButton.setAttribute("aria-label", `${preset.name} 프리셋 삭제`);
+    deleteButton.disabled = spinning;
+    deleteButton.addEventListener("click", () => deleteCustomPreset(preset.name));
+
+    item.append(loadButton, deleteButton);
+    savedPresetList.append(item);
+  });
+  renderPresetSelection();
 }
 
 function drawWheel() {
@@ -139,6 +236,7 @@ function addCandidate(value) {
   if (candidates.length >= maxCandidates) return;
 
   candidates.push(candidate);
+  activePresetId = null;
   clearResult();
   saveCandidates();
   renderCandidates();
@@ -149,17 +247,63 @@ function addCandidate(value) {
 function removeCandidate(index) {
   if (candidates.length <= minCandidates || spinning) return;
   candidates.splice(index, 1);
+  activePresetId = null;
   clearResult();
   saveCandidates();
   renderCandidates();
 }
 
 function setPreset(name) {
-  if (spinning) return;
+  if (spinning || !Object.hasOwn(presets, name)) return;
   candidates = [...presets[name]];
-  presetButtons.forEach((button) => button.classList.toggle("is-active", button.dataset.preset === name));
+  activePresetId = `builtin:${name}`;
+  presetStatus.textContent = "";
   clearResult();
   saveCandidates();
+  renderCandidates();
+}
+
+function saveCurrentPreset(name) {
+  if (spinning) return;
+  const presetName = name.trim();
+  if (!presetName) {
+    presetStatus.textContent = "프리셋 이름을 입력해주세요.";
+    presetNameInput.focus();
+    return;
+  }
+  if (customPresets.some((preset) => preset.name.toLocaleLowerCase() === presetName.toLocaleLowerCase())) {
+    presetStatus.textContent = "같은 이름의 프리셋이 이미 있어요. 다른 이름을 입력해주세요.";
+    presetNameInput.focus();
+    return;
+  }
+
+  const nextPresets = [...customPresets, { name: presetName, candidates: [...candidates] }];
+  if (!saveCustomPresets(nextPresets)) return;
+
+  activePresetId = `custom:${presetName}`;
+  presetNameInput.value = "";
+  presetStatus.textContent = `“${presetName}” 프리셋을 저장했어요.`;
+  renderCandidates();
+}
+
+function applyCustomPreset(name) {
+  if (spinning) return;
+  const preset = customPresets.find((item) => item.name === name);
+  if (!preset) return;
+  candidates = [...preset.candidates];
+  activePresetId = `custom:${preset.name}`;
+  presetStatus.textContent = `“${preset.name}” 프리셋을 불러왔어요.`;
+  clearResult();
+  saveCandidates();
+  renderCandidates();
+}
+
+function deleteCustomPreset(name) {
+  if (spinning) return;
+  const nextPresets = customPresets.filter((preset) => preset.name !== name);
+  if (nextPresets.length === customPresets.length || !saveCustomPresets(nextPresets)) return;
+  if (activePresetId === `custom:${name}`) activePresetId = null;
+  presetStatus.textContent = `“${name}” 프리셋을 삭제했어요.`;
   renderCandidates();
 }
 
@@ -228,10 +372,16 @@ addForm.addEventListener("submit", (event) => {
   addCandidate(candidateInput.value);
 });
 
+presetSaveForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  saveCurrentPreset(presetNameInput.value);
+});
+
 presetButtons.forEach((button) => {
   button.addEventListener("click", () => setPreset(button.dataset.preset));
 });
 
 spinButton.addEventListener("click", spin);
 
+renderCustomPresets();
 renderCandidates();
