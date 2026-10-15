@@ -31,6 +31,13 @@
             </button>
             <div class="settings-menu" id="settings-menu" hidden>
               <span class="settings-menu-label">룰렛 설정</span>
+              <label class="sound-setting" for="sound-toggle">
+                <span class="sound-setting-copy">
+                  <strong>효과음</strong>
+                  <small id="sound-status">결과 순간에만 재생 · 기본 꺼짐</small>
+                </span>
+                <input id="sound-toggle" type="checkbox" aria-describedby="sound-status">
+              </label>
               <button class="clear-all-button" id="clear-all-button" type="button">
                 <span aria-hidden="true">⌫</span> 항목 전체 초기화
               </button>
@@ -62,7 +69,9 @@
           <div class="result" id="result" role="status" aria-live="polite" aria-atomic="true" hidden>
             <span class="result-label">오늘의 당첨</span>
             <strong id="result-name"></strong>
-            <span class="result-confetti" aria-hidden="true">✦</span>
+            <span class="result-burst" aria-hidden="true">
+              <span>✦</span><span>✧</span><span>✦</span><span>✧</span><span>✦</span>
+            </span>
           </div>
         </section>
       </section>

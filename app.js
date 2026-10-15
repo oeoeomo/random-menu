@@ -9,6 +9,7 @@ const minCandidates = 2;
 const maxCandidates = 12;
 const storageKey = "dolly-dolly-candidates";
 const savedPresetsStorageKey = "dolly-dolly-presets";
+const soundStorageKey = "dolly-dolly-result-sound";
 
 const canvas = document.querySelector("#wheel");
 const context = canvas.getContext("2d");
@@ -29,6 +30,8 @@ const resultName = document.querySelector("#result-name");
 const settingsButton = document.querySelector("#settings-button");
 const settingsMenu = document.querySelector("#settings-menu");
 const clearAllButton = document.querySelector("#clear-all-button");
+const soundToggle = document.querySelector("#sound-toggle");
+const soundStatus = document.querySelector("#sound-status");
 const presetButtons = [...document.querySelectorAll(".preset-button")];
 
 let customPresets = loadCustomPresets();
@@ -36,6 +39,85 @@ let candidates = loadCandidates();
 let activePresetId = findActivePresetId(candidates);
 let rotation = 0;
 let spinning = false;
+let soundEnabled = loadSoundPreference();
+let audioContext = null;
+
+soundToggle.checked = soundEnabled;
+soundStatus.textContent = soundEnabled ? "결과 순간에만 재생 · 켜짐" : "결과 순간에만 재생 · 기본 꺼짐";
+
+function loadSoundPreference() {
+  try {
+    return localStorage.getItem(soundStorageKey) === "on";
+  } catch (error) {
+    console.warn("효과음 설정을 불러오지 못했습니다.", error);
+    return false;
+  }
+}
+
+function saveSoundPreference() {
+  try {
+    localStorage.setItem(soundStorageKey, soundEnabled ? "on" : "off");
+  } catch (error) {
+    console.warn("효과음 설정을 저장하지 못했습니다.", error);
+    soundStatus.textContent = "설정을 브라우저에 저장하지 못했어요.";
+  }
+}
+
+function prepareAudio() {
+  if (!window.AudioContext) {
+    soundEnabled = false;
+    soundToggle.checked = false;
+    soundStatus.textContent = "이 브라우저에서는 효과음을 사용할 수 없어요.";
+    saveSoundPreference();
+    return false;
+  }
+
+  try {
+    audioContext ??= new AudioContext();
+    if (audioContext.state === "suspended") {
+      audioContext.resume().catch((error) => {
+        if (!soundEnabled) return;
+        console.warn("효과음을 시작하지 못했습니다.", error);
+        soundEnabled = false;
+        soundToggle.checked = false;
+        soundStatus.textContent = "효과음을 시작하지 못했어요.";
+        saveSoundPreference();
+      });
+    }
+    return true;
+  } catch (error) {
+    console.warn("효과음을 준비하지 못했습니다.", error);
+    soundEnabled = false;
+    soundToggle.checked = false;
+    soundStatus.textContent = "효과음을 준비하지 못했어요.";
+    saveSoundPreference();
+    return false;
+  }
+}
+
+function playResultSound() {
+  if (!soundEnabled || !audioContext || audioContext.state !== "running") return;
+
+  const now = audioContext.currentTime;
+  [659.25, 880].forEach((frequency, index) => {
+    const oscillator = audioContext.createOscillator();
+    const gain = audioContext.createGain();
+    const start = now + index * 0.07;
+    oscillator.type = "sine";
+    oscillator.frequency.setValueAtTime(frequency, start);
+    gain.gain.setValueAtTime(0.0001, start);
+    gain.gain.exponentialRampToValueAtTime(0.055, start + 0.015);
+    gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.22);
+    oscillator.connect(gain);
+    gain.connect(audioContext.destination);
+    oscillator.start(start);
+    oscillator.stop(start + 0.23);
+    oscillator.addEventListener("ended", () => {
+      oscillator.disconnect();
+      gain.disconnect();
+    }, { once: true });
+  });
+}
 
 function loadCustomPresets() {
   try {
@@ -283,10 +365,10 @@ function drawWheel() {
 }
 
 function labelFontSize(count) {
-  if (count <= 4) return 27;
-  if (count <= 6) return 23;
-  if (count <= 8) return 19;
-  return 16;
+  if (count <= 4) return 33;
+  if (count <= 6) return 29;
+  if (count <= 8) return 25;
+  return 21;
 }
 
 function addCandidate(value) {
@@ -379,6 +461,7 @@ function deleteCustomPreset(name) {
 
 function clearResult() {
   result.hidden = true;
+  result.classList.remove("is-winning");
   resultName.textContent = "";
 }
 
@@ -393,6 +476,7 @@ function randomUnit() {
 
 function spin() {
   if (spinning || candidates.length < minCandidates) return;
+  if (soundEnabled) prepareAudio();
   spinning = true;
   gameStatus.textContent = "SPIN IN PROGRESS";
   renderCandidates();
@@ -407,12 +491,14 @@ function spin() {
   const delta = normalize(targetRotation - normalize(rotation)) + (5 + Math.floor(randomUnit() * 3)) * Math.PI * 2;
   const startRotation = rotation;
   const endRotation = rotation + delta;
-  const duration = 4400;
+  const duration = 5000;
   const startTime = performance.now();
 
   function animate(now) {
     const progress = Math.min((now - startTime) / duration, 1);
-    const eased = 1 - Math.pow(1 - progress, 4);
+    const eased = progress < 0.5
+      ? 4 * progress ** 3
+      : 1 - Math.pow(-2 * progress + 2, 3) / 2;
     rotation = startRotation + delta * eased;
     drawWheel();
 
@@ -427,6 +513,10 @@ function spin() {
     gameStatus.textContent = "ROUND COMPLETE";
     resultName.textContent = candidates[winner];
     result.hidden = false;
+    result.classList.remove("is-winning");
+    void result.offsetWidth;
+    result.classList.add("is-winning");
+    playResultSound();
     spinButton.querySelector("span:nth-child(2)").textContent = "다시 돌리기";
     renderCandidates();
   }
@@ -478,6 +568,12 @@ presetButtons.forEach((button) => {
 spinButton.addEventListener("click", spin);
 settingsButton.addEventListener("click", () => {
   setSettingsMenuOpen(settingsMenu.hidden);
+});
+soundToggle.addEventListener("change", () => {
+  soundEnabled = soundToggle.checked;
+  soundStatus.textContent = soundEnabled ? "결과 순간에만 재생 · 켜짐" : "결과 순간에만 재생 · 꺼짐";
+  saveSoundPreference();
+  if (soundEnabled) prepareAudio();
 });
 clearAllButton.addEventListener("click", clearAllCandidates);
 

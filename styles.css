@@ -144,7 +144,7 @@ a:focus-visible {
   top: calc(100% + 9px);
   right: 0;
   display: grid;
-  width: 192px;
+  width: 224px;
   gap: 8px;
   padding: 11px;
   border: 1px solid #354056;
@@ -163,6 +163,41 @@ a:focus-visible {
   font-size: 9px;
   font-weight: 700;
   letter-spacing: 0.7px;
+}
+
+.sound-setting {
+  display: flex;
+  min-height: 42px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 5px 4px;
+  cursor: pointer;
+}
+
+.sound-setting-copy {
+  display: grid;
+  gap: 3px;
+}
+
+.sound-setting-copy strong {
+  color: #dfe4ef;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.sound-setting-copy small {
+  color: #8591a7;
+  font-size: 9px;
+}
+
+.sound-setting input {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 auto;
+  margin: 0;
+  accent-color: var(--lime);
+  cursor: pointer;
 }
 
 .clear-all-button {
@@ -397,6 +432,11 @@ h1 span {
 .spin-icon {
   font-size: 19px;
   line-height: 1;
+  transition: transform 220ms ease;
+}
+
+.spin-button:hover:not(:disabled) .spin-icon {
+  transform: rotate(90deg);
 }
 
 .button-sparkle {
@@ -417,6 +457,7 @@ h1 span {
 }
 
 .result {
+  position: relative;
   display: flex;
   min-height: 39px;
   align-items: center;
@@ -444,8 +485,29 @@ h1 span {
   font-size: 14px;
 }
 
-.result-confetti {
+.result-burst {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  pointer-events: none;
+}
+
+.result-burst span {
+  position: absolute;
   color: var(--lime);
+  font-size: 10px;
+  opacity: 0;
+  animation: result-spark 620ms cubic-bezier(.16, .8, .3, 1) both;
+}
+
+.result-burst span:nth-child(1) { --spark-x: -48px; --spark-y: -20px; }
+.result-burst span:nth-child(2) { --spark-x: -34px; --spark-y: 21px; animation-delay: 35ms; }
+.result-burst span:nth-child(3) { --spark-x: 46px; --spark-y: -18px; animation-delay: 20ms; }
+.result-burst span:nth-child(4) { --spark-x: 35px; --spark-y: 22px; animation-delay: 55ms; }
+.result-burst span:nth-child(5) { --spark-x: 0px; --spark-y: -29px; animation-delay: 10ms; }
+
+.result.is-winning {
+  animation: result-in 300ms cubic-bezier(.2, .8, .2, 1) both, result-win 650ms 200ms ease-out both;
 }
 
 .choice-card {
@@ -814,6 +876,17 @@ h1 span {
 @keyframes result-in {
   from { opacity: 0; transform: translateY(6px) scale(0.96); }
   to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes result-win {
+  35% { box-shadow: 0 0 24px rgb(211 250 85 / 24%); }
+  100% { box-shadow: 0 4px 18px rgb(0 0 0 / 14%); }
+}
+
+@keyframes result-spark {
+  0% { opacity: 0; transform: translate(0, 0) scale(0.35) rotate(-25deg); }
+  28% { opacity: 0.9; }
+  100% { opacity: 0; transform: translate(var(--spark-x), var(--spark-y)) scale(1) rotate(25deg); }
 }
 
 @media (min-width: 1000px) and (min-height: 900px) {
